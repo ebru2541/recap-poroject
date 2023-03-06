@@ -1,27 +1,61 @@
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import CardTotal from "../components/CardTotal";
-import axios from "axios"
-
+import axios from "axios";
 
 const ProductList = () => {
-  const [products, setProducts] = useState([])
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [errorState, setErrorState] = useState(false);
+  const url = process.env.REACT_APP_API_URL;
+  const getProducts = async () => {
+    try {
+      const { data } = await axios(url);
+      setLoading(false);
+      setProducts(data);
+    } catch (error) {
+      setErrorState(true);
+      setLoading(false);
+      console.log(error);
+    }
+  };
+
+  console.log(products);
+  useEffect(() => {
+    getProducts();
+  }, []);
+
   return (
     <div className="container mt-3">
       <div className={"bg-light d-sm-block d-md-flex"}>
-        <p className="text-center text-danger w-100">Loading....</p>
+        {loading ? (
+          <p className="text-center text-danger w-100">Loading....</p>
+        ) : products.length > 0 ? (
+          <>
+            <article id="product-panel" className="col-md-5">
+              {products.map((item) => {
+                return (
+                  <ProductCard
+                    key={item.id}
+                    item={item}
+                    getProducts={getProducts}
+                  />
+                );
+              })}
+            </article>
+            <article className="col-md-5 m-3">
+              <CardTotal products={products} />
+            </article>
+          </>
+        ) : (
+          !errorState && (
+            <p className="text-center text-danger w-100">No products data...</p>
+          )
+        )}
 
-        <>
-          <article id="product-panel" className="col-md-5">
-            <ProductCard />
-          </article>
-          <article className="col-md-5 m-3">
-            <CardTotal />
-          </article>
-        </>
-
-        <p className="text-center text-danger w-100">No products data...</p>
+        {errorState && (
+          <p className="text-center text-danger w-100">Error...</p>
+        )}
       </div>
     </div>
   );

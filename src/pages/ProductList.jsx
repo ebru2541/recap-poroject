@@ -8,6 +8,7 @@ const ProductList = () => {
   const [loading, setLoading] = useState(true);
   const [errorState, setErrorState] = useState(false);
   const url = process.env.REACT_APP_API_URL;
+
   const getProducts = async () => {
     try {
       const { data } = await axios(url);
@@ -20,7 +21,6 @@ const ProductList = () => {
     }
   };
 
-  console.log(products);
   useEffect(() => {
     getProducts();
   }, []);
